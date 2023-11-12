@@ -1,0 +1,58 @@
+body {
+    font-family: 'Pacifico', cursive;
+    background: linear-gradient(to right, #c715a9, #04bdeb);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #910fe7; /* Color similar al botón */
+    color: #ffffff; /* Color del texto */
+    border-radius: 15px; /* Ajusta el valor de border-radius según tus preferencias */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* Ajusta el valor de box-shadow según tus preferencias */
+    padding: 20px;
+    width: 300px;
+    text-align: center; /* Alinea el texto al centro */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+label {
+    font-weight: bold;
+}
+
+button {
+    background-color: #910fe7;
+    color: #000000;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Agrega un efecto de sombra similar al botón */
+}
+
+button:hover {
+    background-color: rgb(143, 160, 69);
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 5px 0;
+}
