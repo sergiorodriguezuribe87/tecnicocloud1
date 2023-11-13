@@ -1,44 +1,54 @@
-// Configuración de Firebase, reemplaza con tus propias credenciales
-var firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_AUTH_DOMAIN",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_STORAGE_BUCKET",
-    messagingSenderId: "TU_MESSAGING_SENDER_ID",
-    appId: "TU_APP_ID"
+const mysql = require('mysql');
+
+// Configuración de la conexión a la base de datos
+const dbConfig = {
+    host: 'TU_HOST',
+    user: 'TU_USUARIO',
+    password: 'TU_CONTRASEÑA',
+    database: 'TU_BASE_DE_DATOS'
 };
 
-// Inicializa Firebase
-firebase.initializeApp(firebaseConfig);
+// Crea la conexión a la base de datos
+const connection = mysql.createConnection(dbConfig);
 
-// Referencia a la colección 'registros'
-var db = firebase.firestore().collection('registros');
+// Conéctate a la base de datos
+connection.connect(err => {
+    if (err) {
+        console.error('Error al conectar a la base de datos:', err);
+        return;
+    }
+    console.log('Conexión exitosa a la base de datos MySQL');
+});
+
+// Referencia a la tabla 'registros'
+const tableName = 'registros';
 
 // Referencias a los campos del formulario
-var nombreInput = document.getElementById('nombre');
-var edadInput = document.getElementById('edad');
-var correoInput = document.getElementById('correo');
-var telefonoInput = document.getElementById('telefono');
-var direccionInput = document.getElementById('direccion');
+const nombreInput = document.getElementById('nombre');
+const edadInput = document.getElementById('edad');
+const correoInput = document.getElementById('correo');
+const telefonoInput = document.getElementById('telefono');
+const direccionInput = document.getElementById('direccion');
 
 // Agregar evento al botón para capturar los datos y agregarlos a la base de datos
 document.getElementById('formulario').addEventListener('submit', function (event) {
     event.preventDefault(); // Evitar el comportamiento por defecto del formulario
 
     // Obtener los valores de los campos del formulario
-    var nombre = nombreInput.value;
-    var edad = edadInput.value;
-    var correo = correoInput.value;
-    var telefono = telefonoInput.value;
-    var direccion = direccionInput.value;
+    const nombre = nombreInput.value;
+    const edad = edadInput.value;
+    const correo = correoInput.value;
+    const telefono = telefonoInput.value;
+    const direccion = direccionInput.value;
 
-    // Agregar el registro a la base de datos en tiempo real
-    db.add({
-        nombre: nombre,
-        edad: edad,
-        correo: correo,
-        telefono: telefono,
-        direccion: direccion
+    // Insertar el registro en la base de datos
+    const insertQuery = `INSERT INTO ${tableName} (nombre, edad, correo, telefono, direccion) VALUES (?, ?, ?, ?, ?)`;
+    connection.query(insertQuery, [nombre, edad, correo, telefono, direccion], (err, result) => {
+        if (err) {
+            console.error('Error al insertar en la base de datos:', err);
+            return;
+        }
+        console.log('Registro insertado en la base de datos');
     });
 
     // Limpia el formulario
@@ -50,11 +60,23 @@ document.getElementById('formulario').addEventListener('submit', function (event
 });
 
 // Escucha los cambios en la base de datos y actualiza la lista
-db.onSnapshot(snapshot => {
+const selectQuery = `SELECT * FROM ${tableName}`;
+connection.query(selectQuery, (err, rows) => {
+    if (err) {
+        console.error('Error al seleccionar datos de la base de datos:', err);
+        return;
+    }
     document.getElementById('listaRegistros').innerHTML = '';
-    snapshot.forEach(doc => {
-        var nuevoElemento = document.createElement('li');
-        nuevoElemento.textContent = `Nombre: ${doc.data().nombre}, Edad: ${doc.data().edad}, Correo: ${doc.data().correo}, Teléfono: ${doc.data().telefono}, Dirección: ${doc.data().direccion}`;
+    rows.forEach(row => {
+        const nuevoElemento = document.createElement('li');
+        nuevoElemento.textContent = `Nombre: ${row.nombre}, Edad: ${row.edad}, Correo: ${row.correo}, Teléfono: ${row.telefono}, Dirección: ${row.direccion}`;
         document.getElementById('listaRegistros').appendChild(nuevoElemento);
     });
 });
+
+// Cierra la conexión cuando la aplicación se detiene
+process.on('SIGINT', () => {
+    connection.end();
+    process.exit();
+});
+
